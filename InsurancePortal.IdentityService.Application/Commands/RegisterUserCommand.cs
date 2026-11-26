@@ -25,7 +25,12 @@ namespace InsurancePortal.IdentityService.Application.Commands
             }
 
             // 2. Create user
-            var user = new UserIdentity(tenantId, dto.Email);
+            var user = new UserIdentity(tenantId, dto.Email)
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Username = dto.Username
+            };
             user.AssignRole(await _userRepository.GetRoleByNameAsync(Roles.Registered));
             await _userRepository.AddUserAsync(user);
 

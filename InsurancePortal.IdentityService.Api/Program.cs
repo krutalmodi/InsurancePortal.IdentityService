@@ -138,11 +138,9 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // 2. ENABLE SWAGGER MIDDLEWARE (Best practice: Restrict to Development environment)
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();   // Serves the generated OpenAPI spec as a JSON endpoint
-    app.UseSwaggerUI(); // Serves the interactive web UI
-}
+//if (app.Environment.IsDevelopment())
+app.UseSwagger();   // Serves the generated OpenAPI spec as a JSON endpoint
+app.UseSwaggerUI(); // Serves the interactive web UI
 
 // 3. ENABLE CORS MIDDLEWARE (Must be before UseAuthorization)
 app.UseCors("AllowFrontend");
@@ -168,10 +166,7 @@ catch (Exception ex)
 #endregion
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.MapOpenApi();
 
 app.UseHttpsRedirection();
 

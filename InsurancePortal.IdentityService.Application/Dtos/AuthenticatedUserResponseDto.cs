@@ -9,5 +9,8 @@ namespace InsurancePortal.IdentityService.Application.DTOs
         string Message,
         string AuthenticatedUser,
         DateTime Timestamp,
-        string Description);
+        string Description,
+        string? FirstName = null,
+        string? LastName = null,
+        string? Username = null);
 }

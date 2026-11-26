@@ -23,7 +23,8 @@ namespace InsurancePortal.IdentityService.Api.Security
                     return null;
                 }
 
-                var sub = principal.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+                var sub = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? principal.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
                 var tenant = principal.FindFirst("tenant")?.Value;
                 if (!Guid.TryParse(sub, out var userId) || !Guid.TryParse(tenant, out var tenantId))
                 {
@@ -31,15 +32,15 @@ namespace InsurancePortal.IdentityService.Api.Security
                 }
 
                 var org = principal.FindFirst("org_id")?.Value;
-                var roles = principal.FindAll("role").Select(c => c.Value).Distinct().ToList();
+                var roles = principal.FindAll(ClaimTypes.Role).Concat(principal.FindAll("role")).Select(c => c.Value).Distinct().ToList();
                 var permissions = principal.FindAll("permission").Select(c => c.Value).Distinct().ToList();
 
                 return new CurrentUserContext(
                     UserId: userId,
-                    Email: principal.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email)?.Value,
+                    Email: principal.FindFirst(ClaimTypes.Email)?.Value ?? principal.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email)?.Value,
                     Username: principal.FindFirst("preferred_username")?.Value,
-                    FirstName: principal.FindFirst("given_name")?.Value,
-                    LastName: principal.FindFirst("family_name")?.Value,
+                    FirstName: principal.FindFirst(ClaimTypes.GivenName)?.Value ?? principal.FindFirst("given_name")?.Value,
+                    LastName: principal.FindFirst(ClaimTypes.Surname)?.Value ?? principal.FindFirst("family_name")?.Value,
                     TenantId: tenantId,
                     OrganizationId: Guid.TryParse(org, out var orgId) ? orgId : null,
                     Roles: roles,

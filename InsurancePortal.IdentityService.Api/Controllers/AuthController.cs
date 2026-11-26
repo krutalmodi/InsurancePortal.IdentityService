@@ -85,6 +85,39 @@ namespace InsurancePortal.IdentityService.Api.Controllers
         }
 
         /// <summary>
+        /// Updates the authenticated user's first and/or last name.
+        /// </summary>
+        [HttpPatch("me")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> UpdateCurrentUser([FromBody] UpdateProfileDto dto, [FromServices] ICurrentUserContext currentUserContext)
+        {
+            var current = currentUserContext.Current;
+            if (current == null)
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userRepository.GetUserByIdAsync(current.UserId);
+            if (user == null || user.TenantId != current.TenantId)
+            {
+                return NotFound();
+            }
+
+            if (dto.FirstName != null)
+            {
+                user.FirstName = dto.FirstName;
+            }
+
+            if (dto.LastName != null)
+            {
+                user.LastName = dto.LastName;
+            }
+
+            await _userRepository.SaveChangesAsync();
+            return NoContent();
+        }
+
+        /// <summary>
         /// Returns the role names assigned to the authenticated user.
         /// </summary>
         [HttpGet("me/roles")]

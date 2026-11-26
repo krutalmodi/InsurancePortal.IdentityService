@@ -91,6 +91,20 @@ Authorization: Bearer <your-access-token>
 
 The exact authentication endpoints, request models, and configuration options depend on the implementation in the repository.
 
+### Registration and profile
+
+`POST /api/auth/register` accepts `email`, `password`, and optional `firstName`, `lastName`, and `username` fields. Each profile field is limited to 100 characters. Existing requests containing only email and password remain supported.
+
+With a bearer token, `GET /api/home/index` returns the saved `firstName`, `lastName`, and `username` alongside the existing welcome response. `GET /api/auth/me` returns the full current profile.
+
+Use `PATCH /api/auth/me` to change the authenticated user's first or last name, for example:
+
+```json
+{ "firstName": "Jane", "lastName": "Doe" }
+```
+
+Supply at least one nonblank name of at most 100 characters. Omitted or null names are unchanged; other fields, including username, email, roles, and tenant, cannot be edited through this endpoint. Successful updates return 204. The profile endpoints read the latest saved values, but existing JWT name claims do not change until a new token is issued.
+
 ## Security Considerations
 
 When adapting this template for production:

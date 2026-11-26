@@ -38,10 +38,8 @@ namespace InsurancePortal.IdentityService.UnitTest.Controllers
         public async Task Register_WithValidCredentials_ShouldReturnOk()
         {
             // Arrange
-            var registerDto = TestDataFactory.CreateValidRegisterDto(
-                email: "newuser@example.com",
-                password: "SecurePassword123!"
-            );
+            var registerDto = new InsurancePortal.IdentityService.Application.DTOs.RegisterDto(
+                "newuser@example.com", "SecurePassword123!", "Jane", "Doe", "jdoe");
 
             var passwordHash = TestDataFactory.CreatePasswordHashResult();
             MockPasswordHasher.Setup(ph => ph.Hash(registerDto.Password))
@@ -75,7 +73,8 @@ namespace InsurancePortal.IdentityService.UnitTest.Controllers
                 registerDto.Email
             ), Times.Once);
 
-            MockUserRepository.Verify(ur => ur.AddUserAsync(It.IsAny<UserIdentity>()), Times.Once);
+            MockUserRepository.Verify(ur => ur.AddUserAsync(It.Is<UserIdentity>(user =>
+                user.Email == registerDto.Email && user.FirstName == "Jane" && user.LastName == "Doe" && user.Username == "jdoe")), Times.Once);
             MockUserRepository.Verify(ur => ur.AddCredentialAsync(It.IsAny<Credential>()), Times.Once);
         }
 
